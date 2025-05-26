@@ -3,8 +3,15 @@
 void Game::initVariables()
 {
 	this->endGame = false;
-
+	if (!font.openFromFile("Assets\\AncizarSans.ttf"))
+		std::cout << "Font initializat fara succes" << std::endl;
+	txtScore = new sf::Text(font);
+	txtScore->setString("Score: ");
+	txtScore->setCharacterSize(32);
+	txtScore->setPosition({ (window->getSize().x / 2.f) - 80.f , 0.f });
 }
+
+int Coin::score = 0;
 
 void Game::initWindow()
 {
@@ -33,19 +40,20 @@ void Game::initWindow()
 	this->coinBottom = new Coin(coinBottomX, cointBottomY, coinRadius, 6.f); // jos
 }
 
-
 //Constructor
 Game::Game()
 {
-	this->initVariables();
 	this->initWindow();
+	this->initVariables();
 }
-
 
 //Destructor
 Game::~Game()
 {
 	delete this->window;
+	delete this->coinTop;
+	delete this->coinBottom;
+	delete this->txtScore;
 }
 
 const bool Game::running() const
@@ -75,12 +83,15 @@ void Game::update()
 
 	this->player.update(this->window);
 
-	std::cout << player;
+	//std::cout << Coin::score << std::endl;
 
 	// Actualizeaza pozitia monedelor
 	float windowWidth = this->window->getSize().x;
-	this->coinTop->update(windowWidth);
-	this->coinBottom->update(windowWidth);
+	this->coinTop->update(windowWidth, player.getGlobalBounds());
+	this->coinBottom->update(windowWidth, player.getGlobalBounds());
+
+	/*std::string text = "Score: ";
+	text.append(itoa(Coin::score));*/
 }
 
 void Game::render()
@@ -92,6 +103,8 @@ void Game::render()
 
 	this->coinTop->render(this->window);
 	this->coinBottom->render(this->window);
+
+	this->window->draw(*txtScore);
 
 	this->window->display();
 }

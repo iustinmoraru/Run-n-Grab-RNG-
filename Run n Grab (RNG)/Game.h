@@ -15,7 +15,9 @@ private:
 	Player player;
 
 	Coin* coinTop;
-	Coin* coinBottom;	
+	Coin* coinBottom;
+	sf::Text* txtScore;
+	sf::Font font;
 
 	void initVariables();
 	void initWindow();

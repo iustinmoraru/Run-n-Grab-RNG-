@@ -13,7 +13,6 @@ void Player::initShape()
 {
 	this->shape.setFillColor(sf::Color::Blue);
 	this->shape.setSize(sf::Vector2f(50.f, 50.f));
-
 }
 
 Player::Player(float x, float y)
@@ -114,14 +113,17 @@ void Player::update(const sf::RenderTarget* target)
 		this->isOnGround = false;
 	}
 
-	// (Optional) Coliziune cu marginile ferestrei (sus, stanga, dreapta)
-	// this->updateWindowBoundsCollision(target);
 }
 
 
 void Player::render(sf::RenderTarget* target)
 {
 	target->draw(this->shape);
+}
+
+sf::FloatRect Player::getGlobalBounds()
+{
+	return shape.getGlobalBounds();
 }
 
 std::ostream& operator<<(std::ostream& c, Player& p)

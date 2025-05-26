@@ -29,6 +29,7 @@ public:
 	void updateWindowBoundsCollision(const sf::RenderTarget* target);
 	void update(const sf::RenderTarget* target);
 	void render(sf::RenderTarget* target);
+	sf::FloatRect getGlobalBounds();
 
 	friend std::ostream& operator << (std::ostream &c, Player &p);
 };
