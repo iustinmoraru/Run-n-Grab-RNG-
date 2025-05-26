@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 
-
+#include "Coin.h"
 #include "Player.h"
 
 
@@ -13,6 +13,9 @@ private:
 	bool endGame;
 
 	Player player;
+
+	Coin* coinTop;
+	Coin* coinBottom;	
 
 	void initVariables();
 	void initWindow();
