@@ -19,6 +19,7 @@ class Meniu
 	std::vector<sf::Text> txtOptions;
 
 public:
+	static bool SelectedOption;
 
 	Meniu(sf::Font& font);
 	~Meniu();

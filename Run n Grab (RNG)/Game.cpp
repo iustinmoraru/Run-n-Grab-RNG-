@@ -24,6 +24,7 @@ void Game::initVariables()
 }
 
 int Collectible::score = 0;
+bool Meniu::SelectedOption = false;
 
 void Game::initWindow()
 {
@@ -32,7 +33,7 @@ void Game::initWindow()
 	this->window->setFramerateLimit(60);
 
 	// Setam pozitia player
-	this->player.setPosition(0.f, window->getSize().x - player.getGlobalBounds().size.y);
+	this->player.setPosition(0.f, window->getSize().x - player.getGlobalBounds().size.y);	
 
 	// Initializare coin-uri dupa crearea ferestrei
 	float coinRadius = 25.f;
@@ -50,15 +51,9 @@ void Game::initWindow()
 	const float collectibleTopX = windowWidth;
 	const float collectibleBottomX = windowWidth + collectibleHorizontalDistance;
 
-	// Initializare collectebles
-	if (selectedCollectible == CollectibleType::Coin) {
-		this->collectibleTop = new Coin(collectibleTopX, collectibleTopY, coinRadius, 6.f);
-		this->collectibleBottom = new Coin(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
-	}
-	else {
-		this->collectibleTop = new Gem(collectibleTopX, collectibleTopY, coinRadius, 6.f);
-		this->collectibleBottom = new Gem(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
-	}
+	// Initial coin-uri
+	this->collectibleTop = new Coin(collectibleTopX, collectibleTopY, coinRadius, 6.f);
+	this->collectibleBottom = new Coin(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
 }
 
 void Game::initSelectCollectibleMenu()
@@ -68,11 +63,13 @@ void Game::initSelectCollectibleMenu()
 	SelectableMenu->addOption("Coin", [&]() {
 		selectedCollectible = CollectibleType::Coin;
 		currentGameState = gameStates::MainMenu;
+		ChangeSelectedCollecteble(); 
 		});
 
 	SelectableMenu->addOption("Gem", [&]() {
 		selectedCollectible = CollectibleType::Gem;
 		currentGameState = gameStates::MainMenu;
+		ChangeSelectedCollecteble(); 
 		});
 
 	SelectableMenu->addOption("Back", [&]() {
@@ -164,6 +161,7 @@ void Game::update()
 	}
 
 	//std::cout << Coin::score << std::endl;
+	std::cout << Meniu::SelectedOption << std::endl;
 
 	if (this->currentGameState == gameStates::Playing)
 	{
@@ -177,10 +175,22 @@ void Game::update()
 		// Conditia de pierdere
 		if (nrLives <= 0)
 		{
+			fisier.open("Assets\\Score.txt", std::ios::app);
+			if (fisier.is_open())
+			{
+				fisier << *this << std::endl;
+				fisier.close();
+			}
+			else
+				std::cout << "Eroare la deschiderea fisierului" << std::endl;
 			std::cout << "Ai pierdut!" << std::endl;
 			this->window->close();
 		}
 	}
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		Meniu::SelectedOption = true;
+	else
+		Meniu::SelectedOption = false;
 }
 
 void Game::render()
@@ -221,4 +231,49 @@ void Game::render()
 	}
 
 	this->window->display();
+}
+
+void Game::ChangeSelectedCollecteble()
+{
+	if (collectibleTop && collectibleBottom) {
+		delete collectibleTop;
+		delete collectibleBottom;
+	}
+	// Initializare coin-uri dupa crearea ferestrei
+	float coinRadius = 25.f;
+	float windowWidth = this->window->getSize().x;
+	float windowHeight = this->window->getSize().y;
+
+	// Pozitii verticale
+	const float collectibleTopY = 225.f;
+	const float collectibleBottomY = 545.f;
+
+	// Distanta orizontala dorita intre coin-uri
+	const float collectibleHorizontalDistance = 350.f;
+
+	// Pozitii orizontale initiale
+	const float collectibleTopX = windowWidth;
+	const float collectibleBottomX = windowWidth + collectibleHorizontalDistance;
+
+	// Initializare collectebles
+	if (selectedCollectible == CollectibleType::Coin) {
+		this->collectibleTop = new Coin(collectibleTopX, collectibleTopY, coinRadius, 6.f);
+		this->collectibleBottom = new Coin(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
+	}
+	else {
+		this->collectibleTop = new Gem(collectibleTopX, collectibleTopY, coinRadius, 6.f);
+		this->collectibleBottom = new Gem(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
+	}
+}
+
+std::ostream& operator<<(std::ostream& c, Game& g)
+{
+	std::string coin = "Coin ";
+	std::string gem = "Gem ";
+	if (g.selectedCollectible == Game::CollectibleType::Coin)
+		c << coin;
+	if (g.selectedCollectible == Game::CollectibleType::Gem)
+		c << gem;
+	c << Collectible::score;
+	return c;
 }

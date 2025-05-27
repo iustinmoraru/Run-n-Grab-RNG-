@@ -21,7 +21,7 @@ void Meniu::handleInputs(sf::RenderWindow& window)
 	for (rsize_t i = 0; i < txtOptions.size(); ++i)
 	{
 		sf::FloatRect optionBounds = txtOptions[i].getGlobalBounds();
-		if (isHovered(optionBounds, window, i) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		if (isHovered(optionBounds, window, i) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && SelectedOption == false)
 		{
 			options[i].action();
 			break;

@@ -1,12 +1,11 @@
 #pragma once
 #include <iostream>
-
+#include <fstream>
 #include "Player.h"
 #include "Meniu.h"
 #include "Collectible.h"
 #include "Coin.h"
 #include "Gem.h"
-
 
 class Game
 {
@@ -17,6 +16,7 @@ private:
 	int nrLives;
 	const float distantaInimi = 35.f;
 	bool stateChangeRequested = false;
+	std::ofstream fisier;
 
 	Player player;
 
@@ -24,13 +24,11 @@ private:
 		MainMenu,
 		Playing,
 		SelectCollectible,
-		nextGameState,
 		Lose
 	}currentGameState;
 
 	enum class CollectibleType { Coin, Gem };
-	CollectibleType selectedCollectible = CollectibleType::Coin;
-
+	CollectibleType selectedCollectible;
 
 	Collectible* collectibleTop;
 	Collectible* collectibleBottom;
@@ -64,5 +62,9 @@ public:
 
 	void update();
 	void render();
+
+	void ChangeSelectedCollecteble();
+
+	friend std::ostream& operator<< (std::ostream& c, Game& g);
 };
 
