@@ -3,12 +3,24 @@
 void Game::initVariables()
 {
 	this->endGame = false;
+
 	if (!font.openFromFile("Assets\\AncizarSans.ttf"))
 		std::cout << "Font initializat fara succes" << std::endl;
 	txtScore = new sf::Text(font);
 	txtScore->setString("Score: ");
 	txtScore->setCharacterSize(32);
 	txtScore->setPosition({ (window->getSize().x / 2.f) - 80.f , 0.f });
+
+	txtLives = new sf::Text(font);
+	txtLives->setString("Lives: ");
+	txtLives->setCharacterSize(32);
+
+	// Lives
+	nrLives = 3;
+	if (!LivesTexture.loadFromFile("Assets\\heart.png"))
+		std::cout << "Textura neinitializata";
+	SpriteLives = new sf::Sprite(LivesTexture);
+	
 }
 
 int Coin::score = 0;
@@ -19,21 +31,24 @@ void Game::initWindow()
 	this->window = new sf::RenderWindow(this->videoMode, "Run n Grab", sf::Style::Titlebar | sf::Style::Close);
 	this->window->setFramerateLimit(60);
 
+	// Setam pozitia player
+	this->player.setPosition(0.f, window->getSize().x - player.getGlobalBounds().size.y);
+
 	// Initializare coin-uri dupa crearea ferestrei
 	float coinRadius = 25.f;
 	float windowWidth = this->window->getSize().x;
 	float windowHeight = this->window->getSize().y;
 
 	// Pozitii verticale
-	float coinTopY = 225.f;
-	float cointBottomY = 545.f;
+	const float coinTopY = 225.f;
+	const float cointBottomY = 545.f;
 
 	// Distanta orizontala dorita intre coin-uri
-	float coinHorizontalDistance = 300.f;
+	const float coinHorizontalDistance = 350.f;
 
 	// Pozitii orizontale initiale
-	float coinTopX = windowWidth;
-	float coinBottomX = windowWidth + coinHorizontalDistance;
+	const float coinTopX = windowWidth;
+	const float coinBottomX = windowWidth + coinHorizontalDistance;
 
 	// Initializare coin-uri
 	this->coinTop = new Coin(coinTopX, coinTopY, coinRadius, 6.f); // sus
@@ -54,6 +69,7 @@ Game::~Game()
 	delete this->coinTop;
 	delete this->coinBottom;
 	delete this->txtScore;
+	delete this->txtLives;
 }
 
 const bool Game::running() const
@@ -90,8 +106,7 @@ void Game::update()
 	this->coinTop->update(windowWidth, player.getGlobalBounds());
 	this->coinBottom->update(windowWidth, player.getGlobalBounds());
 
-	/*std::string text = "Score: ";
-	text.append(itoa(Coin::score));*/
+	txtScore->setString("Score: " + std::to_string(Coin::score));
 }
 
 void Game::render()
@@ -105,6 +120,18 @@ void Game::render()
 	this->coinBottom->render(this->window);
 
 	this->window->draw(*txtScore);
+	this->window->draw(*txtLives);
+
+	// Pozitia de start pentru prima inima dupa text-ul Lives
+	sf::FloatRect livesBounds = txtLives->getGlobalBounds();
+	float startX = livesBounds.position.x + livesBounds.size.x + 10.f;
+	float y = txtLives->getPosition().y;
+
+	for (int i = 0; i < nrLives; i++)
+	{
+		SpriteLives->setPosition({ startX + i * distantaInimi, y + 10.f });
+		this->window->draw(*SpriteLives);
+	}
 
 	this->window->display();
 }

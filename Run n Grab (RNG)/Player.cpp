@@ -126,6 +126,11 @@ sf::FloatRect Player::getGlobalBounds()
 	return shape.getGlobalBounds();
 }
 
+void Player::setPosition(float x, float y)
+{
+	this->shape.setPosition({ x, y });
+}
+
 std::ostream& operator<<(std::ostream& c, Player& p)
 {
 	c << p.shape.getPosition().x << " " << p.shape.getPosition().y << std::endl;

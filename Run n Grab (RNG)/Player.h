@@ -30,6 +30,7 @@ public:
 	void update(const sf::RenderTarget* target);
 	void render(sf::RenderTarget* target);
 	sf::FloatRect getGlobalBounds();
+	void setPosition(float x, float y);
 
 	friend std::ostream& operator << (std::ostream &c, Player &p);
 };
