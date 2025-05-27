@@ -1,8 +1,11 @@
 #pragma once
 #include <iostream>
 
-#include "Coin.h"
 #include "Player.h"
+#include "Meniu.h"
+#include "Collectible.h"
+#include "Coin.h"
+#include "Gem.h"
 
 
 class Game
@@ -16,16 +19,27 @@ private:
 
 	Player player;
 
-	Coin* coinTop;
-	Coin* coinBottom;
+	enum class gameStates {
+		MainMenu,
+		Playing,
+		Lose
+	}currentGameState;
+
+
+	Collectible* collectibleTop;
+	Collectible* collectibleBottom;
+
 	sf::Text* txtScore;
 	sf::Text* txtLives;
 	sf::Font font;
 	sf::Texture LivesTexture;
 	sf::Sprite* SpriteLives;
 
+	Meniu* mainMenu;
+
 	void initVariables();
 	void initWindow();
+	void initMainMenu();
 
 public:
 	Game();

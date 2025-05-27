@@ -1,24 +1,25 @@
-#include "Coin.h"
+#include "Gem.h"
 
-Coin::Coin(float x, float y, float radius, float speed)
+Gem::Gem(float x, float y, float radius, float speed)
     : speed(speed)
 {
-    this->shape.setRadius(radius);
-    this->shape.setFillColor(sf::Color::Yellow);
+    this->shape.setSize( {radius * 1.41f, radius * 1.41f});
+    this->shape.setRotation(sf::degrees(45));
+    this->shape.setFillColor(sf::Color::Red);
     this->shape.setPosition({ x, y });
 }
 
-Coin::~Coin()
+Gem::~Gem()
 {
 }
 
-void Coin::update(float windowWidth, sf::FloatRect playerBounds, int& nrLives)
+void Gem::update(float windowWidth, sf::FloatRect playerBounds, int& nrLives)
 {
     // Deplasare spre stanga
     this->shape.move(sf::Vector2f(-this->speed, 0.f));
 
     // Daca a iesit complet din ecran, reseteaza la dreapta
-    if (this->shape.getPosition().x + this->shape.getRadius() * 2 < 0)
+    if (this->shape.getPosition().x + this->shape.getSize().x < 0)
     {
         if (colected == false)
             nrLives--;
@@ -28,42 +29,42 @@ void Coin::update(float windowWidth, sf::FloatRect playerBounds, int& nrLives)
         sf::Vector2f currentPos = this->shape.getPosition();
         this->shape.setPosition(sf::Vector2f(windowWidth, currentPos.y));
 
-        
+
     }
 
     VerifyColision(playerBounds);
 }
 
 
-void Coin::render(sf::RenderTarget* target)
+void Gem::render(sf::RenderTarget* target)
 {
     if (colected == false)
         target->draw(this->shape);
 
 }
 
-void Coin::resetPosition(float x, float y)
+void Gem::resetPosition(float x, float y)
 {
     this->shape.setPosition({ x, y });
 }
 
-sf::Vector2f Coin::getPosition() const
+sf::Vector2f Gem::getPosition() const
 {
     return this->shape.getPosition();
 }
 
-float Coin::getRadius() const
+float Gem::getRadius() const
 {
-    return this->shape.getRadius();
+    return this->shape.getSize().x;
 }
 
 
-void Coin::reset(float x, float y)
+void Gem::reset(float x, float y)
 {
     this->shape.setPosition({ x, y });
 }
 
-void Coin::VerifyColision(sf::FloatRect playerBounds)
+void Gem::VerifyColision(sf::FloatRect playerBounds)
 {
     sf::Vector2f topRight = playerBounds.position + sf::Vector2f(playerBounds.size.x, 0);
     sf::Vector2f bottomRight = playerBounds.position + sf::Vector2f(playerBounds.size.x, playerBounds.size.y);
@@ -73,17 +74,17 @@ void Coin::VerifyColision(sf::FloatRect playerBounds)
         colected = true;
 }
 
-sf::FloatRect Coin::getGlobalBounds() const
+sf::FloatRect Gem::getGlobalBounds() const
 {
     return this->shape.getGlobalBounds();
 }
 
-void Coin::onCollect()
+void Gem::onCollect()
 {
     this->colected = true;
 }
 
-void Coin::setPosition(float x, float y)
+void Gem::setPosition(float x, float y)
 {
     this->shape.setPosition({ x, y });
 }

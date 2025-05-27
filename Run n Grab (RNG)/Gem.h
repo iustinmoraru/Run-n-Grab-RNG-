@@ -1,22 +1,22 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "Collectible.h"
+#include <SFML/Graphics.hpp>
 
-class Coin : public Collectible
+class Gem : public Collectible
 {
 private:
-    sf::CircleShape shape;
-    float speed;
-    bool colected = false;
+	sf::RectangleShape shape;
+	float speed;
+	bool colected = false;
 
 public:
-    Coin(float x, float y, float radius = 25.f, float speed = 5.f);
-    virtual ~Coin();
+    Gem(float x, float y, float radius = 25.f, float speed = 5.f);
+    virtual ~Gem();
 
-	void render(sf::RenderTarget* target) override;
+    void render(sf::RenderTarget* target) override;
     sf::FloatRect getGlobalBounds() const override;
     void onCollect() override;
-	void setPosition(float x, float y) override;
+    void setPosition(float x, float y) override;
 
 
     void update(float windowWidth, sf::FloatRect playerBounds, int& nrLives);
@@ -27,3 +27,4 @@ public:
     void reset(float x, float y);
     void VerifyColision(sf::FloatRect playerBounds);
 };
+

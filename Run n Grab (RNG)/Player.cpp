@@ -11,7 +11,7 @@ void Player::initVariables()
 
 void Player::initShape()
 {
-	this->shape.setFillColor(sf::Color::Blue);
+	this->shape.setFillColor(sf::Color::Cyan);
 	this->shape.setSize(sf::Vector2f(50.f, 50.f));
 }
 

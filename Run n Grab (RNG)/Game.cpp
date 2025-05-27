@@ -23,7 +23,7 @@ void Game::initVariables()
 	
 }
 
-int Coin::score = 0;
+int Collectible::score = 0;
 
 void Game::initWindow()
 {
@@ -40,19 +40,37 @@ void Game::initWindow()
 	float windowHeight = this->window->getSize().y;
 
 	// Pozitii verticale
-	const float coinTopY = 225.f;
-	const float cointBottomY = 545.f;
+	const float collectibleTopY = 225.f;
+	const float collectibleBottomY = 545.f;
 
 	// Distanta orizontala dorita intre coin-uri
-	const float coinHorizontalDistance = 350.f;
+	const float collectibleHorizontalDistance = 350.f;
 
 	// Pozitii orizontale initiale
-	const float coinTopX = windowWidth;
-	const float coinBottomX = windowWidth + coinHorizontalDistance;
+	const float collectibleTopX = windowWidth;
+	const float collectibleBottomX = windowWidth + collectibleHorizontalDistance;
 
 	// Initializare coin-uri
-	this->coinTop = new Coin(coinTopX, coinTopY, coinRadius, 6.f); // sus
-	this->coinBottom = new Coin(coinBottomX, cointBottomY, coinRadius, 6.f); // jos
+	this->collectibleTop = new Gem(collectibleTopX, collectibleTopY, coinRadius, 6.f); // sus
+	this->collectibleBottom = new Gem(collectibleBottomX, collectibleBottomY, coinRadius, 6.f); // jos
+}
+
+void Game::initMainMenu()
+{
+	this->mainMenu = new Meniu(this->font);
+
+	this->mainMenu->addOption("Play", [&]() {
+		this->currentGameState = gameStates::Playing;
+		});
+
+	this->mainMenu->addOption("Select Collectible", [&]() {
+		this->window->close();
+		});
+
+	this->mainMenu->addOption("Exit", [&]() {
+		this->window->close();
+		});
+
 }
 
 //Constructor
@@ -60,16 +78,18 @@ Game::Game()
 {
 	this->initWindow();
 	this->initVariables();
+	this->initMainMenu();
 }
 
 //Destructor
 Game::~Game()
 {
 	delete this->window;
-	delete this->coinTop;
-	delete this->coinBottom;
+	delete this->collectibleTop;
+	delete this->collectibleBottom;
 	delete this->txtScore;
 	delete this->txtLives;
+	delete this->mainMenu;
 }
 
 const bool Game::running() const
@@ -99,38 +119,63 @@ void Game::update()
 
 	this->player.update(this->window);
 
+	if (this->currentGameState == gameStates::MainMenu)
+	{
+		this->mainMenu->update(*window);
+	}
+
+
+
 	//std::cout << Coin::score << std::endl;
 
-	// Actualizeaza pozitia monedelor
-	float windowWidth = this->window->getSize().x;
-	this->coinTop->update(windowWidth, player.getGlobalBounds());
-	this->coinBottom->update(windowWidth, player.getGlobalBounds());
+	if (this->currentGameState == gameStates::Playing)
+	{
+		// Actualizeaza pozitia monedelor
+		float windowWidth = this->window->getSize().x;
+		this->collectibleTop->update(windowWidth, player.getGlobalBounds(), nrLives);
+		this->collectibleBottom->update(windowWidth, player.getGlobalBounds(), nrLives);
 
-	txtScore->setString("Score: " + std::to_string(Coin::score));
+		txtScore->setString("Score: " + std::to_string(Collectible::score));
+
+		// Conditia de pierdere
+		if (nrLives <= 0)
+		{
+			std::cout << "Ai pierdut!" << std::endl;
+			this->window->close();
+		}
+	}
 }
 
 void Game::render()
 {
     this->window->clear();
 
-	//Render game objects here
-	this->player.render(this->window);
-
-	this->coinTop->render(this->window);
-	this->coinBottom->render(this->window);
-
-	this->window->draw(*txtScore);
-	this->window->draw(*txtLives);
-
-	// Pozitia de start pentru prima inima dupa text-ul Lives
-	sf::FloatRect livesBounds = txtLives->getGlobalBounds();
-	float startX = livesBounds.position.x + livesBounds.size.x + 10.f;
-	float y = txtLives->getPosition().y;
-
-	for (int i = 0; i < nrLives; i++)
+	if (this->currentGameState == gameStates::MainMenu)
 	{
-		SpriteLives->setPosition({ startX + i * distantaInimi, y + 10.f });
-		this->window->draw(*SpriteLives);
+		this->mainMenu->draw(*window);
+	}
+	
+	if (this->currentGameState == gameStates::Playing)
+	{
+		// Render game objects here
+		this->player.render(this->window);
+
+		this->collectibleTop->render(this->window);
+		this->collectibleBottom->render(this->window);
+
+		this->window->draw(*txtScore);
+		this->window->draw(*txtLives);
+
+		// Pozitia de start pentru prima inima dupa text-ul Lives
+		sf::FloatRect livesBounds = txtLives->getGlobalBounds();
+		float startX = livesBounds.position.x + livesBounds.size.x + 10.f;
+		float y = txtLives->getPosition().y;
+
+		for (int i = 0; i < nrLives; i++)
+		{
+			SpriteLives->setPosition({ startX + i * distantaInimi, y + 10.f });
+			this->window->draw(*SpriteLives);
+		}
 	}
 
 	this->window->display();
