@@ -16,14 +16,20 @@ private:
 	bool endGame;
 	int nrLives;
 	const float distantaInimi = 35.f;
+	bool stateChangeRequested = false;
 
 	Player player;
 
 	enum class gameStates {
 		MainMenu,
 		Playing,
+		SelectCollectible,
+		nextGameState,
 		Lose
 	}currentGameState;
+
+	enum class CollectibleType { Coin, Gem };
+	CollectibleType selectedCollectible = CollectibleType::Coin;
 
 
 	Collectible* collectibleTop;
@@ -36,10 +42,13 @@ private:
 	sf::Sprite* SpriteLives;
 
 	Meniu* mainMenu;
+	Meniu* SelectableMenu;
 
 	void initVariables();
 	void initWindow();
 	void initMainMenu();
+
+	void initSelectCollectibleMenu();
 
 public:
 	Game();

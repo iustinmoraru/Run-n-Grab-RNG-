@@ -50,13 +50,45 @@ void Game::initWindow()
 	const float collectibleTopX = windowWidth;
 	const float collectibleBottomX = windowWidth + collectibleHorizontalDistance;
 
-	// Initializare coin-uri
-	this->collectibleTop = new Gem(collectibleTopX, collectibleTopY, coinRadius, 6.f); // sus
-	this->collectibleBottom = new Gem(collectibleBottomX, collectibleBottomY, coinRadius, 6.f); // jos
+	// Initializare collectebles
+	if (selectedCollectible == CollectibleType::Coin) {
+		this->collectibleTop = new Coin(collectibleTopX, collectibleTopY, coinRadius, 6.f);
+		this->collectibleBottom = new Coin(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
+	}
+	else {
+		this->collectibleTop = new Gem(collectibleTopX, collectibleTopY, coinRadius, 6.f);
+		this->collectibleBottom = new Gem(collectibleBottomX, collectibleBottomY, coinRadius, 6.f);
+	}
+}
+
+void Game::initSelectCollectibleMenu()
+{
+	SelectableMenu = new Meniu(font);
+
+	SelectableMenu->addOption("Coin", [&]() {
+		selectedCollectible = CollectibleType::Coin;
+		currentGameState = gameStates::MainMenu;
+		});
+
+	SelectableMenu->addOption("Gem", [&]() {
+		selectedCollectible = CollectibleType::Gem;
+		currentGameState = gameStates::MainMenu;
+		});
+
+	SelectableMenu->addOption("Back", [&]() {
+		currentGameState = gameStates::MainMenu;
+		});
 }
 
 void Game::initMainMenu()
 {
+	// Clean up the previous menu to avoid memory leaks and dangling pointers
+	if (this->mainMenu != nullptr)
+	{
+		delete this->mainMenu;
+		this->mainMenu = nullptr;
+	}
+
 	this->mainMenu = new Meniu(this->font);
 
 	this->mainMenu->addOption("Play", [&]() {
@@ -64,14 +96,15 @@ void Game::initMainMenu()
 		});
 
 	this->mainMenu->addOption("Select Collectible", [&]() {
-		this->window->close();
+		currentGameState = gameStates::SelectCollectible;
+		initSelectCollectibleMenu();
 		});
 
 	this->mainMenu->addOption("Exit", [&]() {
 		this->window->close();
 		});
-
 }
+
 
 //Constructor
 Game::Game()
@@ -79,6 +112,7 @@ Game::Game()
 	this->initWindow();
 	this->initVariables();
 	this->initMainMenu();
+	this->initSelectCollectibleMenu();
 }
 
 //Destructor
@@ -90,6 +124,7 @@ Game::~Game()
 	delete this->txtScore;
 	delete this->txtLives;
 	delete this->mainMenu;
+	delete this->SpriteLives;
 }
 
 const bool Game::running() const
@@ -116,7 +151,6 @@ void Game::pollEvents()
 void Game::update()
 {
 	this->pollEvents();
-
 	this->player.update(this->window);
 
 	if (this->currentGameState == gameStates::MainMenu)
@@ -124,7 +158,10 @@ void Game::update()
 		this->mainMenu->update(*window);
 	}
 
-
+	if (this->currentGameState == gameStates::SelectCollectible && this->SelectableMenu)
+	{
+		this->SelectableMenu->update(*window);
+	}
 
 	//std::cout << Coin::score << std::endl;
 
@@ -153,6 +190,11 @@ void Game::render()
 	if (this->currentGameState == gameStates::MainMenu)
 	{
 		this->mainMenu->draw(*window);
+	}
+
+	if (this->currentGameState == gameStates::SelectCollectible)
+	{
+		this->SelectableMenu->draw(*window);
 	}
 	
 	if (this->currentGameState == gameStates::Playing)
