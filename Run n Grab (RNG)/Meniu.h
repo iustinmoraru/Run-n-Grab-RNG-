@@ -18,10 +18,13 @@ class Meniu
 	std::vector<MenuOption> options;
 	std::vector<sf::Text> txtOptions;
 
+	sf::Texture MeniuImage;
+	sf::Sprite* SpriteMeniu;
+
 public:
 	static bool SelectedOption;
 
-	Meniu(sf::Font& font);
+	Meniu(sf::Font& font, sf::RenderWindow& window);
 	~Meniu();
 
 	bool isHovered(sf::FloatRect optionBounds, sf::RenderWindow& window, size_t i);
@@ -31,5 +34,6 @@ public:
 
 	void update(sf::RenderWindow& window);
 	void draw(sf::RenderWindow& window);
+	void initializareBackground(sf::RenderWindow& window);
 };
 

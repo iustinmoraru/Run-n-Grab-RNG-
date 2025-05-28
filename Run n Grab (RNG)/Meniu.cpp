@@ -1,8 +1,8 @@
 #include "Meniu.h"
 
-Meniu::Meniu(sf::Font& font) : font(font)
+Meniu::Meniu(sf::Font& font, sf::RenderWindow& window) : font(font)
 {
-
+	initializareBackground(window);
 }
 
 Meniu::~Meniu()
@@ -49,7 +49,9 @@ void Meniu::update(sf::RenderWindow& window)
 		optionText.scale({ 0.5f, 0.5f });
 		optionText.setPosition({ 50.f, 50.f + i * 36.f });
 		sf::FloatRect optionBounds = optionText.getGlobalBounds();
-		optionText.setFillColor(isHovered(optionBounds, window, i) ? sf::Color::Yellow : sf::Color::White);
+		optionText.setFillColor(isHovered(optionBounds, window, i) ? sf::Color::Yellow : sf::Color(0, 255, 255));
+		optionText.setOutlineColor(sf::Color::Black);
+		optionText.setOutlineThickness(8.f);
 		txtOptions.push_back(optionText);
 	}
 	this->handleInputs(window);
@@ -57,9 +59,27 @@ void Meniu::update(sf::RenderWindow& window)
 
 void Meniu::draw(sf::RenderWindow& window)
 {
+	window.draw(*SpriteMeniu);
 	for (const auto& textOption : txtOptions)
 	{
 		window.draw(textOption);
+	}
+}
+
+void Meniu::initializareBackground(sf::RenderWindow& window)
+{
+	try
+	{
+		if (!MeniuImage.loadFromFile("Assets\\MeniuBackground.JPG"))
+			throw("Eroare la incarcarea texturii pentru inimi");
+		SpriteMeniu = new sf::Sprite(MeniuImage);
+		SpriteMeniu->setPosition({ 0.f, 0.f });
+		SpriteMeniu->setScale({ window.getSize().x / static_cast<float>(SpriteMeniu->getTexture().getSize().x),
+			window.getSize().y / static_cast<float>(SpriteMeniu->getTexture().getSize().y) });
+	}
+	catch (const char* exceptie)
+	{
+		std::cerr << exceptie << std::endl;
 	}
 }
 

@@ -28,8 +28,6 @@ void Gem::update(float windowWidth, sf::FloatRect playerBounds, int& nrLives)
         colected = false;
         sf::Vector2f currentPos = this->shape.getPosition();
         this->shape.setPosition(sf::Vector2f(windowWidth, currentPos.y));
-
-
     }
 
     VerifyColision(playerBounds);

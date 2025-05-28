@@ -26,9 +26,7 @@ void Coin::update(float windowWidth, sf::FloatRect playerBounds, int& nrLives)
             score++;
         colected = false;
         sf::Vector2f currentPos = this->shape.getPosition();
-        this->shape.setPosition(sf::Vector2f(windowWidth, currentPos.y));
-
-        
+        this->shape.setPosition(sf::Vector2f(windowWidth, currentPos.y));        
     }
 
     VerifyColision(playerBounds);

@@ -4,22 +4,40 @@ void Game::initVariables()
 {
 	this->endGame = false;
 
-	if (!font.openFromFile("Assets\\AncizarSans.ttf"))
-		std::cout << "Font initializat fara succes" << std::endl;
-	txtScore = new sf::Text(font);
-	txtScore->setString("Score: ");
-	txtScore->setCharacterSize(32);
-	txtScore->setPosition({ (window->getSize().x / 2.f) - 80.f , 0.f });
+	try
+	{
+		if (!font.openFromFile("Assets\\AncizarSans.ttf"))
+			throw("Font initializat fara succes");
+		txtScore = new sf::Text(font);
+		txtScore->setString("Score: ");
+		txtScore->setCharacterSize(32);
+		txtScore->setPosition({ (window->getSize().x / 2.f) - 80.f , 0.f });
+		txtScore->setOutlineColor(sf::Color::Black);
+		txtScore->setOutlineThickness(2.f);
 
-	txtLives = new sf::Text(font);
-	txtLives->setString("Lives: ");
-	txtLives->setCharacterSize(32);
+		txtLives = new sf::Text(font);
+		txtLives->setString("Lives: ");
+		txtLives->setCharacterSize(32);
+		txtLives->setOutlineColor(sf::Color::Black);
+		txtLives->setOutlineThickness(2.f);
 
-	// Lives
-	nrLives = 3;
-	if (!LivesTexture.loadFromFile("Assets\\heart.png"))
-		std::cout << "Textura neinitializata";
-	SpriteLives = new sf::Sprite(LivesTexture);
+		// Lives
+		nrLives = 3;
+		if (!LivesTexture.loadFromFile("Assets\\heart.png"))
+			throw("Eroare la incarcarea texturii pentru inimi");
+		SpriteLives = new sf::Sprite(LivesTexture);
+
+		if (!PlayImage.loadFromFile("Assets\\PlayBackground.png"))
+			throw("Eroare la incarcarea texturii pentru butonul Play");
+		SpritePlayImage = new sf::Sprite(PlayImage);
+		SpritePlayImage->setPosition({ 0.f, 0.f });
+		SpritePlayImage->setScale({ window->getSize().x / static_cast<float>(SpritePlayImage->getTexture().getSize().x),
+			window->getSize().y / static_cast<float>(SpritePlayImage->getTexture().getSize().y) });
+	}
+	catch (const char* exceptie)
+	{
+		std::cerr << exceptie << std::endl;
+	}
 	
 }
 
@@ -58,7 +76,7 @@ void Game::initWindow()
 
 void Game::initSelectCollectibleMenu()
 {
-	SelectableMenu = new Meniu(font);
+	SelectableMenu = new Meniu(font, *window);
 
 	SelectableMenu->addOption("Coin", [&]() {
 		selectedCollectible = CollectibleType::Coin;
@@ -88,39 +106,52 @@ void Game::initLoseMenu()
 	delete this->txtGameOver;
 	delete this->txtFinalScore;
 	// Init text
-	if (!font.openFromFile("Assets\\AncizarSans.ttf"))
-		std::cout << "Font initializat fara succes" << std::endl;
-	this->txtGameOver = new sf::Text(font);
-	this->txtGameOver->setString("Game Over");
-	this->txtGameOver->setCharacterSize(45);
+	try
+	{
+		if (!font.openFromFile("Assets\\AncizarSans.ttf"))
+			throw("Font initializat fara succes");
+		this->txtGameOver = new sf::Text(font);
+		this->txtGameOver->setString("Game Over");
+		this->txtGameOver->setCharacterSize(45);
+		this->txtGameOver->setFillColor(sf::Color(0, 255, 255));
+		this->txtGameOver->setOutlineColor(sf::Color::Black);
+		this->txtGameOver->setOutlineThickness(5.f);
 
-	this->txtFinalScore = new sf::Text(font);
-	this->txtFinalScore->setString("Score: " + std::to_string(Collectible::score));
-	this->txtFinalScore->setCharacterSize(45);
+		this->txtFinalScore = new sf::Text(font);
+		this->txtFinalScore->setString("Score " + std::to_string(Collectible::score));
+		this->txtFinalScore->setCharacterSize(45);
+		this->txtFinalScore->setFillColor(sf::Color(0, 255, 255));
+		this->txtFinalScore->setOutlineColor(sf::Color::Black);
+		this->txtFinalScore->setOutlineThickness(5.f);
 
-	sf::Vector2u windowSize = this->window->getSize();
-	sf::FloatRect gameOverBounds = txtGameOver->getGlobalBounds();
-	sf::FloatRect scoreBounds = txtFinalScore->getGlobalBounds();
+		sf::Vector2u windowSize = this->window->getSize();
+		sf::FloatRect gameOverBounds = txtGameOver->getGlobalBounds();
+		sf::FloatRect scoreBounds = txtFinalScore->getGlobalBounds();
 
-	txtGameOver->setPosition(sf::Vector2f(windowSize.x / 2.f - gameOverBounds.size.x / 2.f, 100.f));
-	txtFinalScore->setPosition(sf::Vector2f(windowSize.x / 2.f - scoreBounds.size.x / 2.f, 180.f));	
+		txtGameOver->setPosition(sf::Vector2f(windowSize.x / 2.f - gameOverBounds.size.x / 2.f, 100.f));
+		txtFinalScore->setPosition(sf::Vector2f(windowSize.x / 2.f - scoreBounds.size.x / 2.f, 180.f));
 
-	this->loseMenu = new Meniu(this->font);
-	this->loseMenu->addOption("Play Again", [&]() {
-		this->currentGameState = gameStates::Playing;
-		nrLives = 3; 
-		Collectible::score = 0; 
-		initMainMenu();
-		initSelectCollectibleMenu();
-		});
-	this->loseMenu->addOption("Back to Main Menu", [&]() {
-		this->currentGameState = gameStates::MainMenu;
-		});
+		this->loseMenu = new Meniu(this->font, *window);
+		this->loseMenu->addOption("Play Again", [&]() {
+			this->currentGameState = gameStates::Playing;
+			nrLives = 3;
+			Collectible::score = 0;
+			initMainMenu();
+			initSelectCollectibleMenu();
+			});
+		this->loseMenu->addOption("Back to Main Menu", [&]() {
+			this->currentGameState = gameStates::MainMenu;
+			});
+	}
+	catch (const char* exceptie)
+	{
+		std::cerr << exceptie << std::endl;
+	}
 }
 
 void Game::updateLoseMenu()
 {
-	this->txtFinalScore->setString("Score: " + std::to_string(Collectible::score));
+	this->txtFinalScore->setString("Score " + std::to_string(Collectible::score));
 	sf::FloatRect scoreBounds = txtFinalScore->getGlobalBounds();
 	txtFinalScore->setPosition(sf::Vector2f(window->getSize().x / 2.f - scoreBounds.size.x / 2.f, 180.f));
 }
@@ -134,7 +165,7 @@ void Game::initMainMenu()
 		this->mainMenu = nullptr;
 	}
 
-	this->mainMenu = new Meniu(this->font);
+	this->mainMenu = new Meniu(this->font, *window);
 
 	this->mainMenu->addOption("Play", [&]() {
 		this->currentGameState = gameStates::Playing;
@@ -178,6 +209,7 @@ Game::~Game()
 	delete this->SpriteLives;
 	delete this->SelectableMenu;
 	delete this->loseMenu;
+	delete this->SpritePlayImage;
 }
 
 const bool Game::running() const
@@ -233,15 +265,22 @@ void Game::update()
 		// Conditia de pierdere
 		if (nrLives <= 0)
 		{
-			fisier.open("Assets\\Score.txt", std::ios::app);
-			if (fisier.is_open())
+			try
 			{
-				fisier << *this << std::endl;
-				fisier.close();
+				fisier.open("Assets\\Score.txt", std::ios::app);
+				if (fisier.is_open())
+				{
+					fisier << *this << std::endl;
+					fisier.close();
+				}
+				else
+					throw("Eroare la deschiderea fisierului");
 			}
-			else
-				std::cout << "Eroare la deschiderea fisierului" << std::endl;
-			std::cout << "Ai pierdut!" << std::endl;
+			catch (const char* exceptie)
+			{
+				std::cerr << exceptie << std::endl;
+			}
+
 			updateLoseMenu();
 			this->currentGameState = gameStates::Lose;
 		}
@@ -256,44 +295,56 @@ void Game::render()
 {
     this->window->clear();
 
-	if (this->currentGameState == gameStates::MainMenu)
+	try
 	{
-		this->mainMenu->draw(*window);
-	}
-
-	if (this->currentGameState == gameStates::SelectCollectible)
-	{
-		this->SelectableMenu->draw(*window);
-	}
-
-	if (this->currentGameState == gameStates::Lose)
-	{
-		this->window->draw(*txtGameOver);
-		this->window->draw(*txtFinalScore);
-		this->loseMenu->draw(*window);
-	}
-	
-	if (this->currentGameState == gameStates::Playing)
-	{
-		// Render game objects here
-		this->player.render(this->window);
-
-		this->collectibleTop->render(this->window);
-		this->collectibleBottom->render(this->window);
-
-		this->window->draw(*txtScore);
-		this->window->draw(*txtLives);
-
-		// Pozitia de start pentru prima inima dupa text-ul Lives
-		sf::FloatRect livesBounds = txtLives->getGlobalBounds();
-		float startX = livesBounds.position.x + livesBounds.size.x + 10.f;
-		float y = txtLives->getPosition().y;
-
-		for (int i = 0; i < nrLives; i++)
+		if (this->currentGameState != gameStates::MainMenu && this->currentGameState != gameStates::SelectCollectible && this->currentGameState != gameStates::Lose
+			&& this->currentGameState != gameStates::Playing)
+			throw("Starea jocului nedifinita");
+		if (this->currentGameState == gameStates::MainMenu)
 		{
-			SpriteLives->setPosition({ startX + i * distantaInimi, y + 10.f });
-			this->window->draw(*SpriteLives);
+			this->mainMenu->draw(*window);
 		}
+
+		if (this->currentGameState == gameStates::SelectCollectible)
+		{
+			this->SelectableMenu->draw(*window);
+		}
+
+		if (this->currentGameState == gameStates::Lose)
+		{
+			this->loseMenu->draw(*window);
+			this->window->draw(*txtGameOver);
+			this->window->draw(*txtFinalScore);
+		}
+
+		if (this->currentGameState == gameStates::Playing)
+		{
+			this->window->draw(*SpritePlayImage);
+
+			// Render game objects here
+			this->player.render(this->window);
+
+			this->collectibleTop->render(this->window);
+			this->collectibleBottom->render(this->window);
+
+			this->window->draw(*txtScore);
+			this->window->draw(*txtLives);
+
+			// Pozitia de start pentru prima inima dupa text-ul Lives
+			sf::FloatRect livesBounds = txtLives->getGlobalBounds();
+			float startX = livesBounds.position.x + livesBounds.size.x + 10.f;
+			float y = txtLives->getPosition().y;
+
+			for (int i = 0; i < nrLives; i++)
+			{
+				SpriteLives->setPosition({ startX + i * distantaInimi, y + 10.f });
+				this->window->draw(*SpriteLives);
+			}
+		}
+	}
+	catch (const char* exceptie)
+	{
+		std::cerr << exceptie << std::endl;
 	}
 
 	this->window->display();

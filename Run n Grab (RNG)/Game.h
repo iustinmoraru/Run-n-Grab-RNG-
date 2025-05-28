@@ -45,6 +45,8 @@ private:
 	sf::Font font;
 	sf::Texture LivesTexture;
 	sf::Sprite* SpriteLives;
+	sf::Texture PlayImage;
+	sf::Sprite* SpritePlayImage;
 
 	Meniu* mainMenu;
 	Meniu* SelectableMenu;
