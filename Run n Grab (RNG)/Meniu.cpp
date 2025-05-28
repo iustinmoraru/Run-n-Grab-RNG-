@@ -62,3 +62,4 @@ void Meniu::draw(sf::RenderWindow& window)
 		window.draw(textOption);
 	}
 }
+

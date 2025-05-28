@@ -77,6 +77,54 @@ void Game::initSelectCollectibleMenu()
 		});
 }
 
+void Game::initLoseMenu()
+{
+	// Clean up the previous menu to avoid memory leaks and dangling pointers
+	if (this->loseMenu != nullptr)
+	{
+		delete this->loseMenu;
+		this->loseMenu = nullptr;
+	}
+	delete this->txtGameOver;
+	delete this->txtFinalScore;
+	// Init text
+	if (!font.openFromFile("Assets\\AncizarSans.ttf"))
+		std::cout << "Font initializat fara succes" << std::endl;
+	this->txtGameOver = new sf::Text(font);
+	this->txtGameOver->setString("Game Over");
+	this->txtGameOver->setCharacterSize(45);
+
+	this->txtFinalScore = new sf::Text(font);
+	this->txtFinalScore->setString("Score: " + std::to_string(Collectible::score));
+	this->txtFinalScore->setCharacterSize(45);
+
+	sf::Vector2u windowSize = this->window->getSize();
+	sf::FloatRect gameOverBounds = txtGameOver->getGlobalBounds();
+	sf::FloatRect scoreBounds = txtFinalScore->getGlobalBounds();
+
+	txtGameOver->setPosition(sf::Vector2f(windowSize.x / 2.f - gameOverBounds.size.x / 2.f, 100.f));
+	txtFinalScore->setPosition(sf::Vector2f(windowSize.x / 2.f - scoreBounds.size.x / 2.f, 180.f));	
+
+	this->loseMenu = new Meniu(this->font);
+	this->loseMenu->addOption("Play Again", [&]() {
+		this->currentGameState = gameStates::Playing;
+		nrLives = 3; 
+		Collectible::score = 0; 
+		initMainMenu();
+		initSelectCollectibleMenu();
+		});
+	this->loseMenu->addOption("Back to Main Menu", [&]() {
+		this->currentGameState = gameStates::MainMenu;
+		});
+}
+
+void Game::updateLoseMenu()
+{
+	this->txtFinalScore->setString("Score: " + std::to_string(Collectible::score));
+	sf::FloatRect scoreBounds = txtFinalScore->getGlobalBounds();
+	txtFinalScore->setPosition(sf::Vector2f(window->getSize().x / 2.f - scoreBounds.size.x / 2.f, 180.f));
+}
+
 void Game::initMainMenu()
 {
 	// Clean up the previous menu to avoid memory leaks and dangling pointers
@@ -90,6 +138,9 @@ void Game::initMainMenu()
 
 	this->mainMenu->addOption("Play", [&]() {
 		this->currentGameState = gameStates::Playing;
+		// Resetari 
+		nrLives = 3;
+		Collectible::score = 0;
 		});
 
 	this->mainMenu->addOption("Select Collectible", [&]() {
@@ -110,6 +161,7 @@ Game::Game()
 	this->initVariables();
 	this->initMainMenu();
 	this->initSelectCollectibleMenu();
+	this->initLoseMenu();
 }
 
 //Destructor
@@ -120,8 +172,12 @@ Game::~Game()
 	delete this->collectibleBottom;
 	delete this->txtScore;
 	delete this->txtLives;
+	delete this->txtGameOver;
+	delete this->txtFinalScore;
 	delete this->mainMenu;
 	delete this->SpriteLives;
+	delete this->SelectableMenu;
+	delete this->loseMenu;
 }
 
 const bool Game::running() const
@@ -160,12 +216,14 @@ void Game::update()
 		this->SelectableMenu->update(*window);
 	}
 
-	//std::cout << Coin::score << std::endl;
-	std::cout << Meniu::SelectedOption << std::endl;
+	if (this->currentGameState == gameStates::Lose && this->loseMenu)
+	{
+		this->loseMenu->update(*window);
+	}
 
 	if (this->currentGameState == gameStates::Playing)
 	{
-		// Actualizeaza pozitia monedelor
+		// Actualizeaza pozitia collectibles
 		float windowWidth = this->window->getSize().x;
 		this->collectibleTop->update(windowWidth, player.getGlobalBounds(), nrLives);
 		this->collectibleBottom->update(windowWidth, player.getGlobalBounds(), nrLives);
@@ -184,7 +242,8 @@ void Game::update()
 			else
 				std::cout << "Eroare la deschiderea fisierului" << std::endl;
 			std::cout << "Ai pierdut!" << std::endl;
-			this->window->close();
+			updateLoseMenu();
+			this->currentGameState = gameStates::Lose;
 		}
 	}
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
@@ -205,6 +264,13 @@ void Game::render()
 	if (this->currentGameState == gameStates::SelectCollectible)
 	{
 		this->SelectableMenu->draw(*window);
+	}
+
+	if (this->currentGameState == gameStates::Lose)
+	{
+		this->window->draw(*txtGameOver);
+		this->window->draw(*txtFinalScore);
+		this->loseMenu->draw(*window);
 	}
 	
 	if (this->currentGameState == gameStates::Playing)

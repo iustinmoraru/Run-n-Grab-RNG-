@@ -6,6 +6,11 @@
 #include "Collectible.h"
 #include "Coin.h"
 #include "Gem.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
+#include <SFML/Network.hpp>
 
 class Game
 {
@@ -35,18 +40,23 @@ private:
 
 	sf::Text* txtScore;
 	sf::Text* txtLives;
+	sf::Text* txtGameOver;
+	sf::Text* txtFinalScore;
 	sf::Font font;
 	sf::Texture LivesTexture;
 	sf::Sprite* SpriteLives;
 
 	Meniu* mainMenu;
 	Meniu* SelectableMenu;
+	Meniu* loseMenu;
 
 	void initVariables();
 	void initWindow();
-	void initMainMenu();
 
+	void initMainMenu();
 	void initSelectCollectibleMenu();
+	void initLoseMenu();
+	void updateLoseMenu();
 
 public:
 	Game();
