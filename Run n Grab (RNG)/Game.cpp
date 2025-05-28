@@ -242,10 +242,10 @@ void Game::pollEvents()
     }
 }
 
-void Game::update()
+void Game::update(float dt)
 {
 	this->pollEvents();
-	this->player.update(this->window);
+	this->player.update(this->window, dt);
 
 	if (this->currentGameState == gameStates::MainMenu)
 	{

@@ -1,8 +1,0 @@
-Coin 11
-Coin 2
-Coin 12
-Coin 13
-Coin 14
-Coin 15
-Coin 16
-Coin 16

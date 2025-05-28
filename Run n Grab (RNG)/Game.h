@@ -74,7 +74,7 @@ public:
 	const bool running() const;
 	void pollEvents();
 
-	void update();
+	void update(float dt);
 	void render();
 
 	void ChangeSelectedCollecteble();
