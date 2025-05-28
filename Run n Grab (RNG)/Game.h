@@ -22,6 +22,7 @@ private:
 	const float distantaInimi = 35.f;
 	bool stateChangeRequested = false;
 	std::ofstream fisier;
+	int highScore = 0; 
 
 	Player player;
 
@@ -42,6 +43,7 @@ private:
 	sf::Text* txtLives;
 	sf::Text* txtGameOver;
 	sf::Text* txtFinalScore;
+	sf::Text* txtHighScore;
 	sf::Font font;
 	sf::Texture LivesTexture;
 	sf::Sprite* SpriteLives;
@@ -76,7 +78,9 @@ public:
 	void render();
 
 	void ChangeSelectedCollecteble();
+	void getHighScore();
 
 	friend std::ostream& operator<< (std::ostream& c, Game& g);
+	friend std::istream& operator>> (std::istream& c, Game& g);
 };
 

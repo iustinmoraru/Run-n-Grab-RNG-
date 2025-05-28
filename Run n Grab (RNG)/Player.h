@@ -21,6 +21,7 @@ private:
 	void initVariables();
 	void initShape();
 
+
 public:
 	Player(float x = 0.f, float y = 0.f);
 	virtual ~Player();

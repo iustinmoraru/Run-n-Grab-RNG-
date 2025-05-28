@@ -21,6 +21,14 @@ void Game::initVariables()
 		txtLives->setOutlineColor(sf::Color::Black);
 		txtLives->setOutlineThickness(2.f);
 
+		txtHighScore = new sf::Text(font);
+		getHighScore();
+		txtHighScore->setCharacterSize(32);
+		txtHighScore->setPosition({ window->getSize().x - 205.f, 0.f });
+		txtHighScore->setOutlineColor(sf::Color::Black);
+		txtHighScore->setOutlineThickness(2.f);
+
+
 		// Lives
 		nrLives = 3;
 		if (!LivesTexture.loadFromFile("Assets\\heart.png"))
@@ -210,6 +218,7 @@ Game::~Game()
 	delete this->SelectableMenu;
 	delete this->loseMenu;
 	delete this->SpritePlayImage;
+	delete this->txtHighScore;
 }
 
 const bool Game::running() const
@@ -261,13 +270,34 @@ void Game::update()
 		this->collectibleBottom->update(windowWidth, player.getGlobalBounds(), nrLives);
 
 		txtScore->setString("Score: " + std::to_string(Collectible::score));
+		
+		if (Collectible::score > highScore)
+		{
+			highScore = Collectible::score;
+			txtHighScore->setString("High Score: " + std::to_string(highScore));
+
+			// Salveaza noul high score imediat
+			try
+			{
+				std::ofstream fisier("Assets\\Score.txt", std::ios::app);
+				if (!fisier.is_open())
+					throw("Eroare la deschiderea fisierului pentru update high score");
+
+				fisier << *this << std::endl;
+				fisier.close();
+			}
+			catch (const char* exceptie)
+			{
+				std::cerr << exceptie << std::endl;
+			}
+		}
 
 		// Conditia de pierdere
 		if (nrLives <= 0)
 		{
 			try
 			{
-				fisier.open("Assets\\Score.txt", std::ios::app);
+				std::ofstream fisier("Assets\\Score.txt", std::ios::app);
 				if (fisier.is_open())
 				{
 					fisier << *this << std::endl;
@@ -329,6 +359,7 @@ void Game::render()
 
 			this->window->draw(*txtScore);
 			this->window->draw(*txtLives);
+			this->window->draw(*txtHighScore);
 
 			// Pozitia de start pentru prima inima dupa text-ul Lives
 			sf::FloatRect livesBounds = txtLives->getGlobalBounds();
@@ -383,6 +414,35 @@ void Game::ChangeSelectedCollecteble()
 	}
 }
 
+void Game::getHighScore()
+{
+	try
+	{
+		std::ifstream fisier("Assets\\Score.txt");
+		if (!fisier.is_open())
+			throw("Eroare la deschiderea fisierului pentru citirea scorului");
+		highScore = 0;
+		std::string line;
+		while (std::getline(fisier, line))
+		{
+			size_t pos = line.find_last_of(' ');
+			if (pos != std::string::npos)
+			{
+				int score = std::stoi(line.substr(pos + 1));
+				if (score > highScore)
+					highScore = score;
+			}
+		}
+		fisier.close();
+
+		this->txtHighScore->setString("High Score: " + std::to_string(highScore));
+	}
+	catch (const char* exceptie)
+	{
+		std::cerr << exceptie << std::endl;
+	}
+}
+
 std::ostream& operator<<(std::ostream& c, Game& g)
 {
 	std::string coin = "Coin ";
@@ -392,5 +452,17 @@ std::ostream& operator<<(std::ostream& c, Game& g)
 	if (g.selectedCollectible == Game::CollectibleType::Gem)
 		c << gem;
 	c << Collectible::score;
+	return c;
+}
+
+std::istream& operator>>(std::istream& c, Game& g)
+{
+	std::string collectibleType;
+	c >> collectibleType;
+	if (collectibleType == "Coin")
+		g.selectedCollectible = Game::CollectibleType::Coin;
+	else if (collectibleType == "Gem")
+		g.selectedCollectible = Game::CollectibleType::Gem;
+	c >> Collectible::score;
 	return c;
 }
