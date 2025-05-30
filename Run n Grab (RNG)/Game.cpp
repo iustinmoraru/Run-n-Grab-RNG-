@@ -234,11 +234,6 @@ void Game::pollEvents()
         {
             window->close();
         }
-        else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-        {
-            if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-                window->close();
-        }
     }
 }
 
@@ -319,6 +314,8 @@ void Game::update(float dt)
 		Meniu::SelectedOption = true;
 	else
 		Meniu::SelectedOption = false;
+
+	handleInputs();
 }
 
 void Game::render()
@@ -441,6 +438,12 @@ void Game::getHighScore()
 	{
 		std::cerr << exceptie << std::endl;
 	}
+}
+
+void Game::handleInputs()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
+		this->currentGameState = gameStates::MainMenu;
 }
 
 std::ostream& operator<<(std::ostream& c, Game& g)

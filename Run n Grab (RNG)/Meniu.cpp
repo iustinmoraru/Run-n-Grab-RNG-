@@ -45,7 +45,6 @@ void Meniu::update(sf::RenderWindow& window)
 		sf::Text optionText(font);
 		optionText.setString(options[i].txtBox);
 		optionText.setCharacterSize(50);
-		//optionText.setOrigin({ 0.f, 0.f });
 		optionText.scale({ 0.5f, 0.5f });
 		optionText.setPosition({ 50.f, 50.f + i * 36.f });
 		sf::FloatRect optionBounds = optionText.getGlobalBounds();

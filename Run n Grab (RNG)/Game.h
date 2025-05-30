@@ -20,7 +20,6 @@ private:
 	bool endGame;
 	int nrLives;
 	const float distantaInimi = 35.f;
-	bool stateChangeRequested = false;
 	std::ofstream fisier;
 	int highScore = 0; 
 
@@ -79,6 +78,7 @@ public:
 
 	void ChangeSelectedCollecteble();
 	void getHighScore();
+	void handleInputs();
 
 	friend std::ostream& operator<< (std::ostream& c, Game& g);
 	friend std::istream& operator>> (std::istream& c, Game& g);
